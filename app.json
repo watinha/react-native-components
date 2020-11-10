@@ -1,0 +1,12 @@
+{
+  "name": "react-native-components",
+  "displayName": "react-native-components",
+  "expo": {
+    "name": "react-native-components",
+    "slug": "react-native-components",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
