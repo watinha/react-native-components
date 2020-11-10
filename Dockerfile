@@ -1,8 +1,5 @@
 FROM node:14.15.0-buster-slim
 
-ADD . /app
-WORKDIR /app
-
 EXPOSE 19000
 EXPOSE 19001
 EXPOSE 19002
