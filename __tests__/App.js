@@ -4,7 +4,7 @@ import React from 'react';
 import App from '../App';
 
 // Note: test renderer must be required after react-native.
-import { render, fireEvent, cleanup } from '@testing-library/react-native';
+import { act, render, fireEvent, cleanup } from '@testing-library/react-native';
 
 jest.useFakeTimers();
 afterEach(cleanup);
@@ -16,8 +16,10 @@ it('renders correctly', async () => {
   let { queryAllByText } = render(<App />),
       containers, components1, components2;
 
-  components1 = await queryAllByText('Dummy 1!!!');
-  components2 = await queryAllByText('Dummy 2!!!');
+  await act(async () => {
+    components1 = await queryAllByText('Dummy 1!!!');
+    components2 = await queryAllByText('Dummy 2!!!');
+  });
 
   expect(components1.length).toBe(1);
   expect(components2.length).toBe(0);
@@ -27,9 +29,10 @@ it('changes visible view element after press', async () => {
   let { queryByText, queryAllByText } = render(<App />),
       containers, components1, components2;
 
-  tabItem2 = await queryByText('Dummy 2');
-
-  await fireEvent(tabItem2, 'press');
+  await act(async () => {
+    tabItem2 = await queryByText('Dummy 2');
+    fireEvent.press(tabItem2);
+  });
 
   components1 = await queryAllByText('Dummy 1!!!');
   components2 = await queryAllByText('Dummy 2!!!');
