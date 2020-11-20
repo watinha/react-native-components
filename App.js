@@ -22,11 +22,18 @@ export function DummyComponent2 () {
 
 const Tab = createBottomTabNavigator();
 
-function TabBarIcons (route, focused, color, size) {
+function TabBarIcons (route, { focused, color, size }) {
   let icons = {
-      'Dummy 1': require('./resources/img/camera-line.png'),
-      'Dummy 2': require('./resources/img/image-line.png')
-  };
+        'Dummy 1': require('./resources/img/camera-line.png'),
+        'Dummy 2': require('./resources/img/image-line.png')
+      },
+      focused_icons = {
+        'Dummy 1': require('./resources/img/camera-line-blue.png'),
+        'Dummy 2': require('./resources/img/image-line-blue.png')
+      };
+
+  if (focused)
+      return <Image source={focused_icons[route.name]} />;
   return <Image source={icons[route.name]} />;
 }
 
