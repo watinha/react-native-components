@@ -88,7 +88,7 @@ export default function App() {
         <Tab.Screen name='Dummy 2'
                     component={DummyComponent2}
                     options={{
-                      tabBarColor: '#FF3333'
+                      tabBarColor: '#3333FF'
                     }}></Tab.Screen>
       </Tab.Navigator>
     </NavigationContainer>
