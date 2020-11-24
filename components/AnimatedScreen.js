@@ -1,20 +1,39 @@
 import React, { useState, useEffect } from 'react';
 
-import { View, Text } from 'react-native';
+import { Animated, Text } from 'react-native';
 
-export default function AnimatedScreen ({ navigation, children }) {
-  let [opacity, setOpacity] = useState(0);
+export default function AnimatedScreen ({ navigation, children, style }) {
+  let [opacity, setOpacity] = useState(new Animated.Value(0));
 
   useEffect(() => navigation.addListener('focus', () => {
-    setOpacity(1);
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true
+    }).start();
   }), [navigation]);
 
   useEffect(() => navigation.addListener('blur', () => {
-    setOpacity(0);
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true
+    }).start();
   }), [navigation]);
 
   return (
-    <View testID={'screenView'}
-          style={{opacity: opacity}}> {children} </View>
+    <Animated.View testID={'screenView'}
+          style={{
+            opacity: opacity,
+            transform: [{
+              'translateX': opacity.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-100, 0]
+              })
+            }],
+            ...style
+          }}>
+      {children}
+    </Animated.View>
   );
 }

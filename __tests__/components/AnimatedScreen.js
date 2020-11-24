@@ -42,6 +42,37 @@ it('renders multiple elements inside', () => {
   expect(abacaxi.length).toBe(1);
 });
 
+it('renders styles passed as props', () => {
+  const navigation_mock = { addListener: () => {} },
+        styles_stub = { backgroundColor: 'bla' },
+        { queryByTestId } = render(
+          <AnimatedScreen navigation={navigation_mock}
+                          style={styles_stub}>
+            <Text>Uva</Text>
+            <Text>Abacaxi</Text>
+          </AnimatedScreen>
+        );
+
+  let view = queryByTestId('screenView');
+  expect(view.props.style.backgroundColor).toBe('bla');
+});
+
+it('renders other styles passed as props', () => {
+  const navigation_mock = { addListener: () => {} },
+        styles_stub = { flex: 1, backgroundColor: 'red' },
+        { queryByTestId } = render(
+          <AnimatedScreen navigation={navigation_mock}
+                          style={styles_stub}>
+            <Text>Uva</Text>
+            <Text>Abacaxi</Text>
+          </AnimatedScreen>
+        );
+
+  let view = queryByTestId('screenView');
+  expect(view.props.style.backgroundColor).toBe('red');
+  expect(view.props.style.flex).toBe(1);
+});
+
 it('initializes with opacity state in 0', () => {
   const navigation_mock = { addListener: () => {} },
         { queryByTestId } = render(
