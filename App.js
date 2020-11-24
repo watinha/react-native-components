@@ -1,60 +1,27 @@
-import React, { useState } from 'react';
-import { Animated, Image, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from
   '@react-navigation/material-bottom-tabs';
 
+import AnimatedScreen from './components/AnimatedScreen';
+
 export function DummyComponent1 ({ navigation }) {
-  let [opacity, setOpacity] = useState(new Animated.Value(0));
-
-  if (opacity === 0 && navigation.isFocused()) {
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true
-    }).start();
-  }
-
-  navigation.addListener('focus', () => {
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true
-    }).start();
-  });
-
-  navigation.addListener('blur', () => {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 30,
-      useNativeDriver: true
-    }).start();
-  });
-
   return (
-    <Animated.View style={{
-        backgroundColor: '#FFCCCC',
-        transform: [
-            {
-                'translateX': opacity.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-100, 0]
-                })
-            }
-        ],
-        opacity: opacity,
-        overflow: 'hidden', ...styles.dummy}}>
+    <AnimatedScreen navigation={navigation}
+                    style={{backgroundColor: '#FFCCAA', ...styles.dummy}}>
       <Text>Dummy 1!!!</Text>
       <Image source={require('./resources/img/camera-line.png')} />
-    </Animated.View>
+    </AnimatedScreen>
   );
 }
-export function DummyComponent2 () {
+export function DummyComponent2 ({ navigation }) {
   return (
-    <View style={{backgroundColor: '#AACCFF', ...styles.dummy}}>
+    <AnimatedScreen navigation={navigation}
+                    style={{backgroundColor: '#AACCFF', ...styles.dummy}}>
       <Text>Dummy 2!!!</Text>
-    </View>
+    </AnimatedScreen>
   );
 }
 
@@ -99,8 +66,8 @@ const styles = StyleSheet.create({
   container: {
   },
   dummy: {
-      flex: 1,
-      flexDirection: 'column',
-      justifyContent: 'center'
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center'
   }
 });
