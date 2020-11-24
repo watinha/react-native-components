@@ -89,7 +89,9 @@ it('should change opacity on focus event', () => {
   navigation_mock.addListener.mockReturnValueOnce(unregister_mock);
 
   let { queryByTestId, unmount } = render(
-        <AnimatedScreen navigation={navigation_mock}></AnimatedScreen>);
+        <AnimatedScreen navigation={navigation_mock}
+                        duration={0}></AnimatedScreen>
+      );
 
   act(() => {
     expect(navigation_mock.addListener.mock.calls[0][0]).toBe('focus');
@@ -117,7 +119,8 @@ it('should change opacity on blur event', () => {
                              .mockReturnValueOnce(unregister_mock);
 
   let { queryByTestId, unmount } = render(
-        <AnimatedScreen navigation={navigation_mock}></AnimatedScreen>);
+        <AnimatedScreen navigation={navigation_mock}
+                        duration={0}></AnimatedScreen>);
 
   act(() => {
     const focus_event = navigation_mock.addListener.mock.calls[0][0],

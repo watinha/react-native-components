@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 
 import { Animated, Text } from 'react-native';
 
-export default function AnimatedScreen ({ navigation, children, style }) {
+export default function AnimatedScreen (
+    { navigation, children, style, duration=300 }) {
   let [opacity, setOpacity] = useState(new Animated.Value(0));
 
   useEffect(() => navigation.addListener('focus', () => {
     Animated.timing(opacity, {
       toValue: 1,
-      duration: 300,
+      duration: duration,
       useNativeDriver: true
     }).start();
   }), [navigation]);
@@ -16,7 +17,7 @@ export default function AnimatedScreen ({ navigation, children, style }) {
   useEffect(() => navigation.addListener('blur', () => {
     Animated.timing(opacity, {
       toValue: 0,
-      duration: 300,
+      duration: duration,
       useNativeDriver: true
     }).start();
   }), [navigation]);
