@@ -5,11 +5,12 @@ import { View, Text } from 'react-native';
 import { Camera } from 'expo-camera';
 
 export default function CameraScreen ({ camera }) {
-  let [permission, setPermission] = useState(false);
+  let [permission, setPermission] = useState(false),
+      camera_api = camera ? camera : Camera;
 
   useEffect(() => {
     (async () => {
-      const permissions = await camera.requestPermissionsAsync();
+      const permissions = await camera_api.requestPermissionsAsync();
       setPermission(permissions.status);
     })();
   }, []);
@@ -23,8 +24,8 @@ export default function CameraScreen ({ camera }) {
     );
   }
   return (
-    <View>
-      <Camera testID="camera_element"></Camera>
+    <View style={{flex: 1}}>
+      <Camera style={{flex: 1}}testID="camera_element"></Camera>
     </View>
   );
 }

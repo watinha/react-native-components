@@ -6,13 +6,13 @@ import { createMaterialBottomTabNavigator } from
   '@react-navigation/material-bottom-tabs';
 
 import AnimatedScreen from './components/AnimatedScreen';
+import CameraScreen from './components/CameraScreen';
 
-export function DummyComponent1 ({ navigation }) {
+export function FirstScreen ({ navigation }) {
   return (
     <AnimatedScreen navigation={navigation}
                     style={{backgroundColor: '#FFCCAA', ...styles.dummy}}>
-      <Text>Dummy 1!!!</Text>
-      <Image source={require('./resources/img/camera-line.png')} />
+      <CameraScreen />
     </AnimatedScreen>
   );
 }
@@ -29,11 +29,11 @@ const Tab = createMaterialBottomTabNavigator();
 
 function TabBarIcons (route, { focused, color, size }) {
   let icons = {
-        'Dummy 1': require('./resources/img/camera-line.png'),
+        'Camera': require('./resources/img/camera-line.png'),
         'Dummy 2': require('./resources/img/image-line.png')
       },
       focused_icons = {
-        'Dummy 1': require('./resources/img/camera-fill-white.png'),
+        'Camera': require('./resources/img/camera-fill-white.png'),
         'Dummy 2': require('./resources/img/image-line-white.png')
       };
 
@@ -47,8 +47,8 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator shifting={true} screenOptions={
           ({route}) => ({ tabBarIcon: TabBarIcons.bind(null, route) })}>
-        <Tab.Screen name='Dummy 1'
-                    component={DummyComponent1}
+        <Tab.Screen name='Camera'
+                    component={FirstScreen}
                     options={{
                       tabBarColor: '#FF3333'
                     }}></Tab.Screen>
