@@ -5,8 +5,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from
   '@react-navigation/material-bottom-tabs';
 
+import { Provider } from 'react-redux';
+
 import AnimatedScreen from './components/AnimatedScreen';
 import CameraScreen from './components/CameraScreen';
+import store from './store';
 
 export function FirstScreen ({ navigation }) {
   return (
@@ -44,21 +47,23 @@ function TabBarIcons (route, { focused, color, size }) {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator shifting={true} screenOptions={
-          ({route}) => ({ tabBarIcon: TabBarIcons.bind(null, route) })}>
-        <Tab.Screen name='Camera'
-                    component={FirstScreen}
-                    options={{
-                      tabBarColor: '#FF3333'
-                    }}></Tab.Screen>
-        <Tab.Screen name='Dummy 2'
-                    component={DummyComponent2}
-                    options={{
-                      tabBarColor: '#3333FF'
-                    }}></Tab.Screen>
-      </Tab.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Tab.Navigator shifting={true} screenOptions={
+            ({route}) => ({ tabBarIcon: TabBarIcons.bind(null, route) })}>
+          <Tab.Screen name='Camera'
+                      component={FirstScreen}
+                      options={{
+                        tabBarColor: '#FF3333'
+                      }}></Tab.Screen>
+          <Tab.Screen name='Dummy 2'
+                      component={DummyComponent2}
+                      options={{
+                        tabBarColor: '#3333FF'
+                      }}></Tab.Screen>
+        </Tab.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 

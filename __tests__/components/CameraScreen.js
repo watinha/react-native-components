@@ -1,9 +1,10 @@
 import React from 'react';
+import { Provider } from 'react-redux';
 import { Text } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import fs from 'expo-file-system';
 
-import App from '../App';
+import store from '../../store';
 
 import CameraScreen, { CONSTANTS } from '../../components/CameraScreen';
 
@@ -20,16 +21,20 @@ it('should ask for permissions before rendering', async () => {
       camera_element = null,
       rendered_test = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+  fs.readAsStringAsync.mockImplementation(() => { throw {}; });
 
   await act(async () =>
     rendered_test = await create(
-      <CameraScreen camera={CameraMock}></CameraScreen>));
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+      </Provider>));
 
   camera_element = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.CAMERA_ELEMENT);
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element).not.toBeUndefined();
 
+  fs.readAsStringAsync.mockClear();
 });
 
 it('should not render camera if permissions are not granted', async () => {
@@ -40,10 +45,13 @@ it('should not render camera if permissions are not granted', async () => {
       no_camera_element = null,
       camera_element = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: false});
+  fs.readAsStringAsync.mockImplementation(() => { throw {}; });
 
   await act(async () =>
     rendered_test = await create(
-      <CameraScreen camera={CameraMock}></CameraScreen>));
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+      </Provider>));
 
   camera_element = rendered_test.root.findAll((el) =>
     el.props.testID === CONSTANTS.CAMERA_ELEMENT);
@@ -52,6 +60,8 @@ it('should not render camera if permissions are not granted', async () => {
 
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element.length).toBe(0);
+
+  fs.readAsStringAsync.mockClear();
 });
 
 it('should capture picture when button is pressed', async () => {
@@ -60,23 +70,29 @@ it('should capture picture when button is pressed', async () => {
         takePictureAsync: jest.fn()
       },
       rendered_test = null,
-      button = null;
+      button = null,
+      camera_element = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
-  CameraMock.takePictureAsync.mockResolvedValue({
-    'height': 1000,
-    'width': 800,
-    'uri': 'file:///var/mobile/somewhere'
-  });
   fs.moveAsync.mockReturnValue('');
   fs.readAsStringAsync.mockImplementation(() => { throw {}; });
   fs.writeAsStringAsync.mockReturnValue('');
 
   await act(async () =>
     rendered_test = await create(
-      <CameraScreen camera={CameraMock}></CameraScreen>));
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+      </Provider>));
 
   button = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 1000,
+    'width': 800,
+    'uri': 'file:///var/mobile/somewhere'
+  });
 
   await act(async () =>
     button.props.onPress());
@@ -106,13 +122,9 @@ it('should capture picture when pressed a second time', async () => {
         takePictureAsync: jest.fn()
       },
       rendered_test = null,
-      button = null;
+      button = null,
+      camera_element = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
-  CameraMock.takePictureAsync.mockResolvedValue({
-    'height': 755,
-    'width': 255,
-    'uri': 'file:///var/another/file'
-  });
   fs.moveAsync.mockReturnValue('');
   fs.readAsStringAsync.mockResolvedValue(
     JSON.stringify({
@@ -126,10 +138,20 @@ it('should capture picture when pressed a second time', async () => {
 
   await act(async () =>
     rendered_test = await create(
-      <CameraScreen camera={CameraMock}></CameraScreen>));
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+      </Provider>));
 
   button = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 755,
+    'width': 255,
+    'uri': 'file:///var/another/file'
+  });
 
   await act(async () =>
     button.props.onPress());
