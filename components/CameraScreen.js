@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { View, Text, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
 
 import { Camera } from 'expo-camera';
 import * as fs from 'expo-file-system';
@@ -63,9 +63,25 @@ export default function CameraScreen ({ camera }) {
     <View style={{flex: 1}}>
       <Camera style={{flex: 1}} testID={CONSTANTS.CAMERA_ELEMENT}></Camera>
       <TouchableHighlight testID={CONSTANTS.CAMERA_BUTTON}
+                          style={styles.button}
                           onPress={__onPress}>
-        <Text>Oi</Text>
+        <Text>Take Picture</Text>
       </TouchableHighlight>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    borderWidth: 30,
+    borderRadius: 30,
+    borderColor: '#FFFFFF',
+    height: 0,
+    width: 0,
+    opacity: 0.9,
+    flex: 1,
+    position: 'absolute',
+    bottom: 5,
+    alignSelf: 'center'
+  }
+});
