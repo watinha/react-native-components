@@ -5,6 +5,12 @@ import { View, Text, TouchableHighlight } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as fs from 'expo-file-system';
 
+export const CONSTANTS = {
+  CAMERA_ELEMENT: 'camera_element',
+  CAMERA_BUTTON: 'camera_button',
+  NO_CAMERA_ELEMENT: 'no_camera_message'
+};
+
 export default function CameraScreen ({ camera }) {
   let [permission, setPermission] = useState(false),
       [count, setCount] = useState(0),
@@ -47,7 +53,7 @@ export default function CameraScreen ({ camera }) {
   if (!permission) {
     return (
       <View>
-        <Text testID="no_camera_message">
+        <Text testID={CONSTANTS.NO_CAMERA_MESSAGE}>
           Camera permissions were not granted!!!
         </Text>
       </View>
@@ -55,8 +61,8 @@ export default function CameraScreen ({ camera }) {
   }
   return (
     <View style={{flex: 1}}>
-      <Camera style={{flex: 1}} testID="camera_element"></Camera>
-      <TouchableHighlight testID="camera_button"
+      <Camera style={{flex: 1}} testID={CONSTANTS.CAMERA_ELEMENT}></Camera>
+      <TouchableHighlight testID={CONSTANTS.CAMERA_BUTTON}
                           onPress={__onPress}>
         <Text>Oi</Text>
       </TouchableHighlight>

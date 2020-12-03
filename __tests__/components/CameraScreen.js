@@ -5,7 +5,7 @@ import fs from 'expo-file-system';
 
 import App from '../App';
 
-import CameraScreen from '../../components/CameraScreen';
+import CameraScreen, { CONSTANTS } from '../../components/CameraScreen';
 
 jest.useFakeTimers();
 
@@ -26,7 +26,7 @@ it('should ask for permissions before rendering', async () => {
       <CameraScreen camera={CameraMock}></CameraScreen>));
 
   camera_element = rendered_test.root.find((el) =>
-    el.props.testID === 'camera_element');
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element).not.toBeUndefined();
 
@@ -46,9 +46,9 @@ it('should not render camera if permissions are not granted', async () => {
       <CameraScreen camera={CameraMock}></CameraScreen>));
 
   camera_element = rendered_test.root.findAll((el) =>
-    el.props.testID === 'camera_element');
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
   no_camera_element = rendered_test.root.find((el) =>
-    el.props.testID === 'no_camera_message');
+    el.props.testID === CONSTANTS.NO_CAMERA_MESSAGE);
 
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element.length).toBe(0);
@@ -76,7 +76,7 @@ it('should capture picture when button is pressed', async () => {
       <CameraScreen camera={CameraMock}></CameraScreen>));
 
   button = rendered_test.root.find((el) =>
-    el.props.testID === 'camera_button');
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
 
   await act(async () =>
     button.props.onPress());
@@ -129,7 +129,7 @@ it('should capture picture when pressed a second time', async () => {
       <CameraScreen camera={CameraMock}></CameraScreen>));
 
   button = rendered_test.root.find((el) =>
-    el.props.testID === 'camera_button');
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
 
   await act(async () =>
     button.props.onPress());
