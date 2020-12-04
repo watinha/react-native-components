@@ -12,21 +12,8 @@ export const photo_slice = createSlice({
     load: (state, action) => {
       return { count: action.payload.count, pictures: action.payload.pictures };
     },
-    take_picture: (state, action) => {
-      fs.moveAsync(action['payload']['uri'],
-        `${fs.documentDirectory}/${state.count + 1}.png`);
-      fs.writeAsStringAsync(
-        `${fs.documentDirectory}/pictures.json`,
-        JSON.stringify({
-          count: (state.count + 1),
-          pictures: [{
-            uri: `${fs.documentDirectory}/${state.count + 1}.png`,
-            height: action['payload']['height'],
-            width: action['payload']['width']
-          }, ...state.pictures]
-        })
-      );
-      return { ...state, count: state.count + 1 };
+    update_state: (state, action) => {
+      return action['payload'];
     }
   },
 });
@@ -42,5 +29,26 @@ export const load_json = () => {
     } catch (e) {
       throw e;
     }
+  };
+};
+export const take_picture = (photo) => {
+  return async (dispatch, getState) => {
+    const state = getState(),
+          new_state = {
+            count: (state.photo.count + 1),
+            pictures: [{
+              uri: `${fs.documentDirectory}/${state.photo.count + 1}.png`,
+              height: photo['height'],
+              width: photo['width']
+            }, ...state.photo.pictures]
+          };
+    await fs.moveAsync({
+      from: photo['uri'],
+      to: `${fs.documentDirectory}${state.photo.count + 1}.png`
+    });
+    await fs.writeAsStringAsync(
+      `${fs.documentDirectory}/pictures.json`,
+      JSON.stringify(new_state));
+    dispatch(photo_slice.actions.update_state(new_state));
   };
 };

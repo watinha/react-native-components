@@ -97,9 +97,10 @@ it('should capture picture when button is pressed', async () => {
   await act(async () =>
     button.props.onPress());
 
-  expect(fs.moveAsync).toBeCalledWith(
-    'file:///var/mobile/somewhere',
-    `${fs.documentDirectory}/1.png`);
+  expect(fs.moveAsync).toBeCalledWith({
+    from: 'file:///var/mobile/somewhere',
+    to: `undefined1.png`
+  });
   expect(fs.writeAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({
@@ -156,9 +157,10 @@ it('should capture picture when pressed a second time', async () => {
   await act(async () =>
     button.props.onPress());
 
-  expect(fs.moveAsync).toBeCalledWith(
-    'file:///var/another/file',
-    `${fs.documentDirectory}/2.png`);
+  expect(fs.moveAsync).toBeCalledWith({
+    from: 'file:///var/another/file',
+    to: `undefined2.png`
+  });
   expect(fs.writeAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({

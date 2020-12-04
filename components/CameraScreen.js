@@ -5,7 +5,7 @@ import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
 
 import { Camera } from 'expo-camera';
 
-import { photo_slice, load_json } from '../reducers/photo';
+import { load_json, take_picture } from '../reducers/photo';
 
 export const CONSTANTS = {
   CAMERA_ELEMENT: 'camera_element',
@@ -29,7 +29,7 @@ export default function CameraScreen ({ Camera_mock }) {
 
   const __onPress = async () => {
     const photo = await camera.takePictureAsync();
-    dispatch(photo_slice.actions.take_picture(photo))
+    dispatch(take_picture(photo))
   };
 
   if (!permission) {
