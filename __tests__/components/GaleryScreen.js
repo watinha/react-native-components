@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Image, Text } from 'react-native';
-import { act, create, update } from 'react-test-renderer';
+import { act, create } from 'react-test-renderer';
 import * as fs from 'expo-file-system';
 
 import store from '../../store';
@@ -54,8 +54,6 @@ it('should render galery screen two images', async () => {
 
   await act(async () =>
     rendered_test = await create(component));
-
-  await act(async () => await rendered_test.update(component));
 
   const images = rendered_test.root.findAllByType(Image);
   expect(images.length).toBe(2);
