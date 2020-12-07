@@ -1,9 +1,18 @@
 import React, { useEffect } from 'react';
 
-import { View, StyleSheet, Image } from 'react-native';
+import { FlatList, View, StyleSheet, Image } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { load_json, map_pictures } from '../reducers/photo';
+
+function renderPicture ({ item }) {
+  return (
+    <View style={styles.item_container}>
+      <Image style={styles.image}
+             source={{ uri: item.uri }}></Image>
+    </View>
+  );
+}
 
 export default function GaleryScreen () {
   let pictures = useSelector(map_pictures),
@@ -14,12 +23,9 @@ export default function GaleryScreen () {
   }, []);
 
   return (
-    <View>
-    {pictures.map((picture, index) =>
-      <Image style={styles.image}
-             key={`Image-${index}`}
-             source={{ uri: picture.uri }}></Image>)}
-    </View>
+    <FlatList data={pictures}
+              renderItem={renderPicture}
+              keyExtractor={(item, index) => `picture-${index}`} />
   );
 };
 
@@ -28,4 +34,10 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
   },
+  item_container: {
+    flex: 1,
+    margin: 7,
+    padding: 3,
+    backgroundColor: 'white'
+  }
 });
