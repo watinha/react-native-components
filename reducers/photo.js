@@ -52,3 +52,18 @@ export const take_picture = (photo) => {
     dispatch(photo_slice.actions.update_state(new_state));
   };
 };
+export const delete_picture = (item) => {
+  return async (dispatch, getState) => {
+    const state = getState(),
+          new_state = {
+            count: (state.photo.pictures.length - 1),
+            pictures: state.photo.pictures.filter((picture) =>
+              picture.uri !== item.uri)
+          };
+    await fs.deleteAsync(item.uri);
+    await fs.writeAsStringAsync(
+      `${fs.documentDirectory}/pictures.json`,
+      JSON.stringify(new_state));
+    dispatch(photo_slice.actions.update_state(new_state));
+  };
+};
