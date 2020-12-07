@@ -13,37 +13,41 @@ jest.useFakeTimers();
 jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 jest.mock('expo-file-system');
 
-it('should render galery screen with one image', async () => {
-  let rendered_test;
+let rendered_test;
 
+const component = (
+  <Provider store={store}>
+    <GaleryScreen></GaleryScreen>
+  </Provider>);
+
+beforeEach(() => {
   fs.readAsStringAsync = jest.fn();
+  fs.writeAsStringAsync = jest.fn();
+  fs.deleteAsync = jest.fn();
+});
+
+afterEach(() => {
+  rendered_test.unmount();
+  fs.readAsStringAsync.mockClear();
+  fs.writeAsStringAsync.mockClear();
+  fs.deleteAsync.mockClear();
+});
+
+it('should render galery screen with one image', async () => {
   fs.readAsStringAsync.mockResolvedValue(JSON.stringify({
     count: 1,
     pictures: [
       { uri: `file:///1.png`, height: 1000, width: 800 }
     ]
   }));
-
   await act(async () =>
-    rendered_test = await create(
-      <Provider store={store}>
-        <GaleryScreen></GaleryScreen>
-      </Provider>));
+    rendered_test = await create(component));
 
   const image = rendered_test.root.findByType(Image);
   expect(image.props.source.uri).toBe('file:///1.png');
-
-  fs.readAsStringAsync.mockClear();
 });
 
 it('should render galery screen two images', async () => {
-  const component = (
-    <Provider store={store}>
-      <GaleryScreen></GaleryScreen>
-    </Provider>);
-  let rendered_test;
-
-  fs.readAsStringAsync = jest.fn();
   fs.readAsStringAsync.mockResolvedValue(JSON.stringify({
     count: 2,
     pictures: [
@@ -59,18 +63,9 @@ it('should render galery screen two images', async () => {
   expect(images.length).toBe(2);
   expect(images[0].props.source.uri).toBe('file:///2.png');
   expect(images[1].props.source.uri).toBe('file:///3.png');
-
-  fs.readAsStringAsync.mockClear();
 });
 
 it('should delete an image after clicking the delete button', async () => {
-  const component = (
-    <Provider store={store}>
-      <GaleryScreen></GaleryScreen>
-    </Provider>);
-  let rendered_test;
-
-  fs.readAsStringAsync = jest.fn();
   fs.readAsStringAsync.mockResolvedValue(JSON.stringify({
     count: 3,
     pictures: [
@@ -79,8 +74,6 @@ it('should delete an image after clicking the delete button', async () => {
       { uri: `file:///1.png`, height: 12, width: 96 }
     ]
   }));
-  fs.writeAsStringAsync.mockReturnValue('');
-  fs.deleteAsync.mockReturnValue('');
 
   await act(async () =>
     rendered_test = await create(component));
@@ -107,20 +100,9 @@ it('should delete an image after clicking the delete button', async () => {
   expect(images.length).toBe(2);
   expect(images[0].props.source.uri).toBe('file:///3.png');
   expect(images[1].props.source.uri).toBe('file:///1.png');
-
-  fs.readAsStringAsync.mockClear();
-  fs.writeAsStringAsync.mockClear();
-  fs.deleteAsync.mockClear();
 });
 
 it('should delete an image after clicking another button', async () => {
-  const component = (
-    <Provider store={store}>
-      <GaleryScreen></GaleryScreen>
-    </Provider>);
-  let rendered_test;
-
-  fs.readAsStringAsync = jest.fn();
   fs.readAsStringAsync.mockResolvedValue(JSON.stringify({
     count: 3,
     pictures: [
@@ -129,8 +111,6 @@ it('should delete an image after clicking another button', async () => {
       { uri: `file:///1.png`, height: 12, width: 96 }
     ]
   }));
-  fs.writeAsStringAsync.mockReturnValue('');
-  fs.deleteAsync.mockReturnValue('');
 
   await act(async () =>
     rendered_test = await create(component));
@@ -157,8 +137,4 @@ it('should delete an image after clicking another button', async () => {
   expect(images.length).toBe(2);
   expect(images[0].props.source.uri).toBe('file:///2.png');
   expect(images[1].props.source.uri).toBe('file:///3.png');
-
-  fs.readAsStringAsync.mockClear();
-  fs.writeAsStringAsync.mockClear();
-  fs.deleteAsync.mockClear();
 });
