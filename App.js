@@ -9,21 +9,22 @@ import { Provider } from 'react-redux';
 
 import AnimatedScreen from './components/AnimatedScreen';
 import CameraScreen from './components/CameraScreen';
+import GaleryScreen from './components/GaleryScreen';
 import store from './store';
 
 export function FirstScreen ({ navigation }) {
   return (
     <AnimatedScreen navigation={navigation}
-                    style={{backgroundColor: '#FFCCAA', ...styles.dummy}}>
+                    style={{backgroundColor: '#FFCCAA', ...styles.screen}}>
       <CameraScreen />
     </AnimatedScreen>
   );
 }
-export function DummyComponent2 ({ navigation }) {
+export function SecondScreen ({ navigation }) {
   return (
     <AnimatedScreen navigation={navigation}
-                    style={{backgroundColor: '#AACCFF', ...styles.dummy}}>
-      <Text>Dummy 2!!!</Text>
+                    style={{backgroundColor: '#AACCFF', ...styles.screen}}>
+      <GaleryScreen />
     </AnimatedScreen>
   );
 }
@@ -33,11 +34,11 @@ const Tab = createMaterialBottomTabNavigator();
 function TabBarIcons (route, { focused, color, size }) {
   let icons = {
         'Camera': require('./resources/img/camera-line.png'),
-        'Dummy 2': require('./resources/img/image-line.png')
+        'Galery': require('./resources/img/image-line.png')
       },
       focused_icons = {
         'Camera': require('./resources/img/camera-fill-white.png'),
-        'Dummy 2': require('./resources/img/image-line-white.png')
+        'Galery': require('./resources/img/image-line-white.png')
       };
 
   if (focused)
@@ -56,8 +57,8 @@ export default function App() {
                       options={{
                         tabBarColor: '#FF3333'
                       }}></Tab.Screen>
-          <Tab.Screen name='Dummy 2'
-                      component={DummyComponent2}
+          <Tab.Screen name='Galery'
+                      component={SecondScreen}
                       options={{
                         tabBarColor: '#3333FF'
                       }}></Tab.Screen>
@@ -70,7 +71,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
   },
-  dummy: {
+  screen: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center'
