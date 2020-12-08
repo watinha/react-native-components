@@ -21,11 +21,7 @@ export default function GaleryScreen ({ anim_duration }) {
           toValue: 0,
           duration: duration,
           useNativeDriver: false
-        }).start();
-        if (duration === 0)
-          dispatch(delete_picture(item));
-        else
-          setTimeout(() => dispatch(delete_picture(item)), duration);
+        }).start(() => dispatch(delete_picture(item)));
       };
     };
 
@@ -57,7 +53,7 @@ export default function GaleryScreen ({ anim_duration }) {
   return (
     <FlatList data={pictures}
               renderItem={renderPicture}
-              keyExtractor={(item, index) => `picture-${index}`} />
+              keyExtractor={(item) => `picture-${item.uri}`} />
   );
 };
 
