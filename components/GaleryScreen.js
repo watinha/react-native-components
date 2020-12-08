@@ -20,8 +20,9 @@ export default function GaleryScreen () {
       <View style={styles.item_container}>
         <Image style={styles.image}
                source={{ uri: item.uri }}></Image>
-        <TouchableHighlight onPress={deletePicture(item)}>
-          <Text>Delete</Text>
+        <TouchableHighlight style={styles.delete_button}
+                            onPress={deletePicture(item)}>
+          <Text style={{ textAlign: 'center' }}>Delete</Text>
         </TouchableHighlight>
       </View>
     );
@@ -41,12 +42,20 @@ export default function GaleryScreen () {
 const styles = StyleSheet.create({
   image: {
     height: 100,
-    width: 100,
+    width: 100
   },
   item_container: {
     flex: 1,
     margin: 7,
     padding: 3,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  delete_button: {
+    height: 100,
+    width: 70,
+    justifyContent: 'center',
+    backgroundColor: '#FFAAAA'
   }
 });
