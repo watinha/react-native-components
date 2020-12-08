@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { FlatList, View, StyleSheet, Image, Text, TouchableHighlight }
+import React, { useEffect, useRef } from 'react';
+import { FlatList, Animated, StyleSheet, Image, Text, TouchableHighlight }
   from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import fs from 'expo-file-system';
@@ -7,24 +7,46 @@ import fs from 'expo-file-system';
 import { load_json, map_pictures, delete_picture }
   from '../reducers/photo';
 
-export default function GaleryScreen () {
+export default function GaleryScreen ({ anim_duration }) {
+  const duration = anim_duration === 0 ? anim_duration : 200;
   let pictures = useSelector(map_pictures),
       dispatch = useDispatch();
 
-  const deletePicture = (item) => {
-    return () => dispatch(delete_picture(item));
-  };
-
   const renderPicture = ({ item }) => {
+    const height_anim = new Animated.Value(106);
+
+    const delete_clicked = (item) => {
+      return () => {
+        Animated.timing(height_anim, {
+          toValue: 0,
+          duration: duration,
+          useNativeDriver: false
+        }).start();
+        if (duration === 0)
+          dispatch(delete_picture(item));
+        else
+          setTimeout(() => dispatch(delete_picture(item)), duration);
+      };
+    };
+
     return (
-      <View style={styles.item_container}>
+      <Animated.View style={[
+          styles.item_container,
+          {
+            maxHeight: height_anim,
+            padding: height_anim.interpolate({
+              inputRange: [0, 106],
+              outputRange: [0, 3]
+            }),
+            overflow: 'hidden'
+          }]}>
         <Image style={styles.image}
                source={{ uri: item.uri }}></Image>
         <TouchableHighlight style={styles.delete_button}
-                            onPress={deletePicture(item)}>
+                            onPress={delete_clicked(item)}>
           <Text style={{ textAlign: 'center' }}>Delete</Text>
         </TouchableHighlight>
-      </View>
+      </Animated.View>
     );
   };
 

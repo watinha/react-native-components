@@ -17,7 +17,7 @@ let rendered_test;
 
 const component = (
   <Provider store={store}>
-    <GaleryScreen></GaleryScreen>
+    <GaleryScreen anim_duration={0}></GaleryScreen>
   </Provider>);
 
 beforeEach(() => {
