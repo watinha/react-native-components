@@ -69,6 +69,7 @@ it('should capture picture when button is pressed', async () => {
         requestPermissionsAsync: jest.fn(),
         takePictureAsync: jest.fn()
       },
+      date_mock = { getTime: () => 321 },
       rendered_test = null,
       button = null,
       camera_element = null;
@@ -80,7 +81,8 @@ it('should capture picture when button is pressed', async () => {
   await act(async () =>
     rendered_test = await create(
       <Provider store={store}>
-        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}></CameraScreen>
       </Provider>));
 
   button = rendered_test.root.find((el) =>
@@ -99,14 +101,17 @@ it('should capture picture when button is pressed', async () => {
 
   expect(fs.moveAsync).toBeCalledWith({
     from: 'file:///var/mobile/somewhere',
-    to: `undefined1.png`
+    to: `undefined321.png`
   });
   expect(fs.writeAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({
       count: 1,
       pictures: [
-        { uri: `${fs.documentDirectory}/1.png`, height: 1000, width: 800 }
+        {
+          uri: `${fs.documentDirectory}/321.png`,
+          height: 1000, width: 800
+        }
       ]
     }));
   expect(fs.readAsStringAsync).toBeCalledWith(
@@ -122,6 +127,7 @@ it('should capture picture when pressed a second time', async () => {
         requestPermissionsAsync: jest.fn(),
         takePictureAsync: jest.fn()
       },
+      date_mock = { getTime: () => 777 },
       rendered_test = null,
       button = null,
       camera_element = null;
@@ -140,7 +146,8 @@ it('should capture picture when pressed a second time', async () => {
   await act(async () =>
     rendered_test = await create(
       <Provider store={store}>
-        <CameraScreen Camera_mock={CameraMock}></CameraScreen>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}></CameraScreen>
       </Provider>));
 
   button = rendered_test.root.find((el) =>
@@ -159,15 +166,15 @@ it('should capture picture when pressed a second time', async () => {
 
   expect(fs.moveAsync).toBeCalledWith({
     from: 'file:///var/another/file',
-    to: `undefined2.png`
+    to: `undefined777.png`
   });
   expect(fs.writeAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({
       count: 2,
       pictures: [
-        { uri: `${fs.documentDirectory}/2.png`, height: 755, width: 255 },
-        { uri: '1.png', height: 1, width: 2 }
+        {uri: `${fs.documentDirectory}/777.png`, height: 755, width: 255},
+        {uri: '1.png', height: 1, width: 2}
       ]
     }));
   expect(fs.readAsStringAsync).toBeCalledWith(

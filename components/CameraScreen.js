@@ -13,7 +13,7 @@ export const CONSTANTS = {
   NO_CAMERA_ELEMENT: 'no_camera_message'
 };
 
-export default function CameraScreen ({ Camera_mock }) {
+export default function CameraScreen ({ Camera_mock, date_mock }) {
   let [permission, setPermission] = useState(false),
       dispatch = useDispatch(),
       camera_api = Camera_mock ? Camera_mock : Camera,
@@ -28,8 +28,9 @@ export default function CameraScreen ({ Camera_mock }) {
   }, []);
 
   const __onPress = async () => {
-    const photo = await camera.takePictureAsync();
-    dispatch(take_picture(photo))
+    const date = date_mock ? date_mock : new Date(),
+          photo = await camera.takePictureAsync();
+    dispatch(take_picture(photo, date))
   };
 
   if (!permission) {
