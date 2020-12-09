@@ -14,14 +14,29 @@ jest.useFakeTimers();
 jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 jest.mock('expo-file-system');
 
-it('should ask for permissions before rendering', async () => {
-  let CameraMock = {
-        requestPermissionsAsync: jest.fn()
-      },
-      camera_element = null,
-      rendered_test = null;
-  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+let CameraMock = null,
+    date_mock = null,
+    rendered_test = null;
+
+beforeEach(() => {
+  CameraMock = {
+    requestPermissionsAsync: jest.fn(),
+    takePictureAsync: jest.fn()
+  };
+  date_mock = { getTime: () => 321 };
   fs.readAsStringAsync.mockImplementation(() => { throw {}; });
+  fs.writeAsStringAsync.mockReturnValue('');
+  fs.moveAsync.mockReturnValue('');
+});
+
+afterEach(() => {
+  fs.moveAsync.mockClear();
+  fs.readAsStringAsync.mockClear();
+  fs.writeAsStringAsync.mockClear();
+});
+
+it('should ask for permissions before rendering', async () => {
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
 
   await act(async () =>
     rendered_test = await create(
@@ -29,23 +44,17 @@ it('should ask for permissions before rendering', async () => {
         <CameraScreen Camera_mock={CameraMock}></CameraScreen>
       </Provider>));
 
-  camera_element = rendered_test.root.find((el) =>
+  const camera_element = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.CAMERA_ELEMENT);
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element).not.toBeUndefined();
-
-  fs.readAsStringAsync.mockClear();
 });
 
 it('should not render camera if permissions are not granted', async () => {
-  let CameraMock = {
-        requestPermissionsAsync: jest.fn()
-      },
-      rendered_test = null,
-      no_camera_element = null,
+  let no_camera_element = null,
       camera_element = null;
+
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: false});
-  fs.readAsStringAsync.mockImplementation(() => { throw {}; });
 
   await act(async () =>
     rendered_test = await create(
@@ -60,23 +69,13 @@ it('should not render camera if permissions are not granted', async () => {
 
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element.length).toBe(0);
-
-  fs.readAsStringAsync.mockClear();
 });
 
 it('should capture picture when button is pressed', async () => {
-  let CameraMock = {
-        requestPermissionsAsync: jest.fn(),
-        takePictureAsync: jest.fn()
-      },
-      date_mock = { getTime: () => 321 },
-      rendered_test = null,
+  let date_mock = { getTime: () => 321 },
       button = null,
       camera_element = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
-  fs.moveAsync.mockReturnValue('');
-  fs.readAsStringAsync.mockImplementation(() => { throw {}; });
-  fs.writeAsStringAsync.mockReturnValue('');
 
   await act(async () =>
     rendered_test = await create(
@@ -89,6 +88,7 @@ it('should capture picture when button is pressed', async () => {
     el.props.testID === CONSTANTS.CAMERA_BUTTON);
   camera_element = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+
   camera_element.instance.takePictureAsync = jest.fn();
   camera_element.instance.takePictureAsync.mockResolvedValue({
     'height': 1000,
@@ -116,23 +116,14 @@ it('should capture picture when button is pressed', async () => {
     }));
   expect(fs.readAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`);
-
-  fs.moveAsync.mockClear();
-  fs.readAsStringAsync.mockClear();
-  fs.writeAsStringAsync.mockClear();
 });
 
 it('should capture picture when pressed a second time', async () => {
-  let CameraMock = {
-        requestPermissionsAsync: jest.fn(),
-        takePictureAsync: jest.fn()
-      },
-      date_mock = { getTime: () => 777 },
-      rendered_test = null,
+  let date_mock = { getTime: () => 777 },
       button = null,
       camera_element = null;
   CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
-  fs.moveAsync.mockReturnValue('');
+  fs.readAsStringAsync.mockClear();
   fs.readAsStringAsync.mockResolvedValue(
     JSON.stringify({
       count: 1,
@@ -141,7 +132,6 @@ it('should capture picture when pressed a second time', async () => {
       ]
     })
   );
-  fs.writeAsStringAsync.mockReturnValue('');
 
   await act(async () =>
     rendered_test = await create(
@@ -179,8 +169,4 @@ it('should capture picture when pressed a second time', async () => {
     }));
   expect(fs.readAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`);
-
-  fs.moveAsync.mockClear();
-  fs.readAsStringAsync.mockClear();
-  fs.writeAsStringAsync.mockClear();
 });
