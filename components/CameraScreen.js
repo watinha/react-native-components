@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Image, View, Text, TouchableHighlight, StyleSheet }
+import { Animated, Image, View, Text, TouchableHighlight, StyleSheet }
   from 'react-native';
 
 import { Camera } from 'expo-camera';
@@ -23,7 +23,8 @@ export default function CameraScreen (
       dispatch = useDispatch(),
       camera_api = Camera_mock ? Camera_mock : Camera,
       camera = null,
-      duration = duration_parameter === 0 ? 0 : 200;
+      duration = duration_parameter === 0 ? 0 : 500,
+      [movement_anim, setMovement_anim] = useState(new Animated.Value(0));
 
   useEffect(() => {
     (async () => {
@@ -38,10 +39,14 @@ export default function CameraScreen (
           photo = await camera.takePictureAsync(),
           preview = await dispatch(take_picture(photo, date));
     setPreview(preview);
-    if (duration === 0)
-      setPreview(false)
-    else
-      setTimeout(() => setPreview(false), duration);
+    Animated.timing(movement_anim, {
+      toValue: 100,
+      duration: duration,
+      useNativeDriver: true
+    }).start(() => {
+      setPreview(false);
+      setMovement_anim(new Animated.Value(0));
+    });
   };
 
   if (!permission) {
@@ -63,9 +68,32 @@ export default function CameraScreen (
         <Text>Take Picture</Text>
       </TouchableHighlight>
       {preview && (
+      <Animated.View style={[styles.preview_view, {
+        opacity: movement_anim.interpolate({
+          inputRange: [0, 100],
+          outputRange: [1, 0]
+        }),
+        transform: [{
+          'translateY': movement_anim.interpolate({
+            inputRange: [0, 100],
+            outputRange: [0, 1000]
+          })
+        }, {
+          'translateX': movement_anim.interpolate({
+            inputRange: [0, 100],
+            outputRange: [0, -150]
+          })
+        }, {
+          'scale': movement_anim.interpolate({
+            inputRange: [0, 100],
+            outputRange: [1, 0.3]
+          })
+        }],
+      }]}>
         <Image testID={CONSTANTS.PREVIEW_ELEMENT}
                style={styles.preview}
                source={{ uri: preview['uri'] }}></Image>
+      </Animated.View>
       )}
     </View>
   );
@@ -86,6 +114,11 @@ const styles = StyleSheet.create({
   },
   preview: {
     height: 100,
-    width: 100,
+    width: 100
+  },
+  preview_view: {
+    position: 'absolute',
+    top: 0,
+    right: 0
   }
 });
