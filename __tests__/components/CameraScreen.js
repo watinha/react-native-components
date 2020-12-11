@@ -209,6 +209,9 @@ it('should show preview element after press', async () => {
   preview = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
   expect(preview.props.source.uri).toBe(`${fs.documentDirectory}/888.png`);
+  button = rendered_test.root.findAll((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  expect(button.length).toBe(0); // hide button
 });
 
 it('should show preview of another element after press', async () => {
@@ -241,6 +244,9 @@ it('should show preview of another element after press', async () => {
   preview = rendered_test.root.find((el) =>
     el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
   expect(preview.props.source.uri).toBe(`${fs.documentDirectory}/123.png`);
+  button = rendered_test.root.findAll((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  expect(button.length).toBe(0); // hide button
 });
 
 it('should remove preview element after some time', async () => {
@@ -274,4 +280,7 @@ it('should remove preview element after some time', async () => {
   preview = rendered_test.root.findAll((el) =>
     el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
   expect(preview.length).toBe(0);
+  button = rendered_test.root.findAll((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  expect(button.length).toBeGreaterThan(0); // show button again
 });

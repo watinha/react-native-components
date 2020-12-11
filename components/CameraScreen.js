@@ -62,11 +62,13 @@ export default function CameraScreen (
     <View style={{flex: 1}}>
       <Camera ref={(el) => camera = el} style={{flex: 1}}
               testID={CONSTANTS.CAMERA_ELEMENT}></Camera>
-      <TouchableHighlight testID={CONSTANTS.CAMERA_BUTTON}
-                          style={styles.button}
-                          onPress={__onPress}>
-        <Text>Take Picture</Text>
-      </TouchableHighlight>
+      {!preview && (
+        <TouchableHighlight testID={CONSTANTS.CAMERA_BUTTON}
+                            style={styles.button}
+                            onPress={__onPress}>
+          <Text>Take Picture</Text>
+        </TouchableHighlight>
+      )}
       {preview && (
       <Animated.View style={[styles.preview_view, {
         opacity: movement_anim.interpolate({
