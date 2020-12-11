@@ -1,11 +1,12 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { Text } from 'react-native';
+import { Provider, useSelector } from 'react-redux';
+import { Text, View } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import fs from 'expo-file-system';
 
 import create_store from '../../store';
 import CameraScreen, { CONSTANTS } from '../../components/CameraScreen';
+import { map_new_count } from '../../reducers/photo';
 
 jest.useFakeTimers();
 
@@ -115,6 +116,7 @@ it('should capture picture when button is pressed', async () => {
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({
       count: 1,
+      new_count: 1,
       pictures: [
         {
           uri: `${fs.documentDirectory}/321.png`,
@@ -135,6 +137,7 @@ it('should capture picture when pressed a second time', async () => {
   fs.readAsStringAsync.mockResolvedValue(
     JSON.stringify({
       count: 1,
+      new_count: 2,
       pictures: [
         { uri: '1.png', height: 1, width: 2 }
       ]
@@ -170,6 +173,7 @@ it('should capture picture when pressed a second time', async () => {
     `${fs.documentDirectory}/pictures.json`,
     JSON.stringify({
       count: 2,
+      new_count: 3,
       pictures: [
         {uri: `${fs.documentDirectory}/777.png`, height: 755, width: 255},
         {uri: '1.png', height: 1, width: 2}
@@ -283,4 +287,114 @@ it('should remove preview element after some time', async () => {
   button = rendered_test.root.findAll((el) =>
     el.props.testID === CONSTANTS.CAMERA_BUTTON);
   expect(button.length).toBeGreaterThan(0); // show button again
+});
+
+it('should present 0 new count as rendered', async () => {
+  let date_mock = { getTime: () => 999 },
+      button = null,
+      camera_element = null,
+      count_stub = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+
+  function StubComponent () {
+    const count = useSelector(map_new_count);
+    return <Text testID={'count_stub'}>{count}</Text>;
+  };
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}
+                      duration_parameter={0}></CameraScreen>
+        <StubComponent />
+      </Provider>));
+
+  count_stub = rendered_test.root.find((el) =>
+    el.props.testID === 'count_stub');
+  expect(count_stub.props.children).toBe(0);
+});
+
+it('should present 0 new count when picture.json does not have new_count', async () => {
+  let date_mock = { getTime: () => 999 },
+      button = null,
+      camera_element = null,
+      count_stub = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+  fs.readAsStringAsync.mockClear();
+  fs.readAsStringAsync.mockResolvedValue(
+    JSON.stringify({
+      count: 1,
+      pictures: [
+        { uri: '1.png', height: 1, width: 2 }
+      ]
+    })
+  );
+
+  function StubComponent () {
+    const count = useSelector(map_new_count);
+    return <Text testID={'count_stub'}>{count}</Text>;
+  };
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}
+                      duration_parameter={0}></CameraScreen>
+        <StubComponent />
+      </Provider>));
+
+  count_stub = rendered_test.root.find((el) =>
+    el.props.testID === 'count_stub');
+  expect(count_stub.props.children).toBe(0);
+});
+
+it('should increment new pictures count to 1, then 2', async () => {
+  let date_mock = { getTime: () => 999 },
+      button = null,
+      camera_element = null,
+      count_stub = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+
+  function StubComponent () {
+    const count = useSelector(map_new_count);
+    return <Text testID={'count_stub'}>{count}</Text>;
+  };
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}
+                      duration_parameter={0}></CameraScreen>
+        <StubComponent />
+      </Provider>));
+
+  button = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 755,
+    'width': 255,
+    'uri': 'file:///another.thing'
+  });
+
+  await act(async () =>
+    await button.props.onPress());
+
+  count_stub = rendered_test.root.find((el) =>
+    el.props.testID === 'count_stub');
+  expect(count_stub.props.children).toBe(1);
+  button = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+
+  await act(async () =>
+    await button.props.onPress());
+
+  count_stub = rendered_test.root.find((el) =>
+    el.props.testID === 'count_stub');
+  expect(count_stub.props.children).toBe(2);
 });

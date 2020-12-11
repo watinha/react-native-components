@@ -6,17 +6,23 @@ export const photo_slice = createSlice({
   name: 'photo',
   initialState: {
     count: 0,
-    pictures: []
+    pictures: [],
+    new_count: 0
   },
   reducers: {
     load: (state, action) => {
-      return { count: action.payload.count, pictures: action.payload.pictures };
+      return {
+        count: action.payload.count,
+        pictures: action.payload.pictures,
+        new_count: (action.payload.new_count ? action.payload.new_count : 0)
+      };
     }
   },
 });
 
 export const map_count = (state) => state.photo.count;
 export const map_pictures = (state) => state.photo.pictures;
+export const map_new_count = (state) => state.photo.new_count;
 export const load_json = () => {
   return async (dispatch) => {
     try {
@@ -33,6 +39,7 @@ export const take_picture = (photo, date) => {
     const state = getState(),
           new_state = {
             count: (state.photo.count + 1),
+            new_count: (state.photo.new_count + 1),
             pictures: [{
               uri: `${fs.documentDirectory}/${date.getTime()}.png`,
               height: photo['height'],
