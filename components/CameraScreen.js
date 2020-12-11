@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Animated, Image, View, Text, TouchableHighlight, StyleSheet }
   from 'react-native';
 
 import { Camera } from 'expo-camera';
 
-import { load_json, take_picture, map_pictures } from '../reducers/photo';
+import { load_json, take_picture } from '../reducers/photo';
 
 export const CONSTANTS = {
   CAMERA_ELEMENT: 'camera_element',
@@ -19,7 +19,6 @@ export default function CameraScreen (
     { Camera_mock, date_mock, duration_parameter }) {
   let [permission, setPermission] = useState(false),
       [preview, setPreview] = useState(false),
-      pictures = useSelector(map_pictures),
       dispatch = useDispatch(),
       camera_api = Camera_mock ? Camera_mock : Camera,
       camera = null,
