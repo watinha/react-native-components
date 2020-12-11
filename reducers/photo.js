@@ -10,6 +10,9 @@ export const photo_slice = createSlice({
     new_count: 0
   },
   reducers: {
+    reset_new_count: (state, action) => {
+      return { ...state, new_count: 0 };
+    },
     load: (state, action) => {
       return {
         count: action.payload.count,
@@ -23,6 +26,7 @@ export const photo_slice = createSlice({
 export const map_count = (state) => state.photo.count;
 export const map_pictures = (state) => state.photo.pictures;
 export const map_new_count = (state) => state.photo.new_count;
+export const reset_new_count = photo_slice.actions.reset_new_count;
 export const load_json = () => {
   return async (dispatch) => {
     try {

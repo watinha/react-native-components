@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 import { Animated, Text } from 'react-native';
 
+export const NavigationContext = React.createContext({});
+
 export default function AnimatedScreen (
     { navigation, children, style, duration=300 }) {
   let [opacity, setOpacity] = useState(new Animated.Value(0));
@@ -34,7 +36,9 @@ export default function AnimatedScreen (
             }],
             ...style
           }}>
-      {children}
+      <NavigationContext.Provider value={navigation}>
+        {children}
+      </NavigationContext.Provider>
     </Animated.View>
   );
 }

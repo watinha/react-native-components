@@ -1,11 +1,13 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { Image, TouchableHighlight } from 'react-native';
+import { Provider, useSelector } from 'react-redux';
+import { Image, TouchableHighlight, Text } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import * as fs from 'expo-file-system';
 
 import create_store from '../../store';
 import GaleryScreen from '../../components/GaleryScreen';
+import { map_new_count } from '../../reducers/photo';
+import { NavigationContext } from '../../components/AnimatedScreen';
 
 jest.useFakeTimers();
 
@@ -14,11 +16,14 @@ jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 jest.mock('expo-file-system');
 
 let rendered_test,
+    navigation_mock = { addListener: jest.fn() },
     store = create_store();
 
 const component = (
   <Provider store={store}>
-    <GaleryScreen anim_duration={0}></GaleryScreen>
+    <NavigationContext.Provider value={navigation_mock}>
+      <GaleryScreen anim_duration={0}></GaleryScreen>
+    </NavigationContext.Provider>
   </Provider>);
 
 beforeEach(() => {
@@ -139,4 +144,46 @@ it('should delete an image after clicking another button', async () => {
   expect(images.length).toBe(2);
   expect(images[0].props.source.uri).toBe('file:///2.png');
   expect(images[1].props.source.uri).toBe('file:///3.png');
+});
+
+it('should reset new_count on focus', async () => {
+  const unregister_fn = jest.fn(),
+        navigation_mock = {
+          addListener: jest.fn()
+        };
+  navigation_mock.addListener.mockReturnValue(unregister_fn);
+  fs.readAsStringAsync.mockResolvedValue(JSON.stringify({
+    count: 3,
+    new_count: 3,
+    pictures: []
+  }));
+
+  function FakeCount () {
+    const new_count = useSelector(map_new_count);
+    return <Text testID={'fake_count'}>{new_count}</Text>
+  }
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <NavigationContext.Provider value={navigation_mock}>
+          <GaleryScreen anim_duration={0}></GaleryScreen>
+        </NavigationContext.Provider>
+        <FakeCount />
+      </Provider>
+    ));
+
+  expect(navigation_mock.addListener).toHaveBeenCalled();
+  expect(navigation_mock.addListener.mock.calls[0][0]).toBe('focus');
+  const callback = navigation_mock.addListener.mock.calls[0][1];
+  act(() => callback());
+
+  const fake_count = rendered_test.root.find((el) =>
+    el.props.testID === 'fake_count');
+  expect(fake_count.props.children).toBe(0);
+
+  act(() => {
+    rendered_test.unmount();
+  });
+  expect(unregister_fn).toHaveBeenCalled();
 });

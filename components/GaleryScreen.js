@@ -1,16 +1,25 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { FlatList, Animated, StyleSheet, Image, Text, TouchableHighlight }
   from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch,  } from 'react-redux';
 import fs from 'expo-file-system';
 
-import { load_json, map_pictures, delete_picture }
-  from '../reducers/photo';
+import { load_json, map_pictures,
+         delete_picture, reset_new_count } from '../reducers/photo';
+import { NavigationContext } from './AnimatedScreen';
 
 export default function GaleryScreen ({ anim_duration }) {
   const duration = anim_duration === 0 ? anim_duration : 200;
   let pictures = useSelector(map_pictures),
-      dispatch = useDispatch();
+      dispatch = useDispatch(),
+      navigation = useContext(NavigationContext);
+
+  useEffect(() => {
+    dispatch(load_json());
+    return navigation.addListener('focus', () => {
+      dispatch(reset_new_count());
+    });
+  }, []);
 
   const renderPicture = ({ item }) => {
     const height_anim = new Animated.Value(106);
@@ -45,10 +54,6 @@ export default function GaleryScreen ({ anim_duration }) {
       </Animated.View>
     );
   };
-
-  useEffect(() => {
-    dispatch(load_json());
-  }, []);
 
   return (
     <FlatList data={pictures}
