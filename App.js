@@ -5,8 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from
   '@react-navigation/material-bottom-tabs';
 
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 
+import { map_new_count } from './reducers/photo';
 import AnimatedScreen from './components/AnimatedScreen';
 import CameraScreen from './components/CameraScreen';
 import GaleryScreen from './components/GaleryScreen';
@@ -48,25 +49,33 @@ function TabBarIcons (route, { focused, color, size }) {
 
 const store = create_store();
 
-export default function App() {
+export default function Main() {
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Tab.Navigator shifting={true} screenOptions={
-            ({route}) => ({ tabBarIcon: TabBarIcons.bind(null, route) })}>
-          <Tab.Screen name='Camera'
-                      component={FirstScreen}
-                      options={{
-                        tabBarColor: '#FF3333'
-                      }}></Tab.Screen>
-          <Tab.Screen name='Galery'
-                      component={SecondScreen}
-                      options={{
-                        tabBarColor: '#3333FF'
-                      }}></Tab.Screen>
-        </Tab.Navigator>
-      </NavigationContainer>
+      <App />
     </Provider>
+  );
+}
+
+function App() {
+  const new_count = useSelector(map_new_count);
+  return (
+    <NavigationContainer>
+      <Tab.Navigator shifting={true} screenOptions={
+          ({route}) => ({ tabBarIcon: TabBarIcons.bind(null, route) })}>
+        <Tab.Screen name='Camera'
+                    component={FirstScreen}
+                    options={{
+                      tabBarColor: '#FF6666'
+                    }}></Tab.Screen>
+        <Tab.Screen name='Galery'
+                    component={SecondScreen}
+                    options={{
+                      tabBarColor: '#3333FF',
+                      tabBarBadge: (new_count === 0 ? false : new_count)
+                    }}></Tab.Screen>
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
