@@ -4,7 +4,7 @@ import { Image, TouchableHighlight } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import * as fs from 'expo-file-system';
 
-import store from '../../store';
+import create_store from '../../store';
 import GaleryScreen from '../../components/GaleryScreen';
 
 jest.useFakeTimers();
@@ -13,7 +13,8 @@ jest.useFakeTimers();
 jest.mock('react-native/Libraries/Animated/src/NativeAnimatedHelper');
 jest.mock('expo-file-system');
 
-let rendered_test;
+let rendered_test,
+    store = create_store();
 
 const component = (
   <Provider store={store}>
@@ -24,6 +25,7 @@ beforeEach(() => {
   fs.readAsStringAsync = jest.fn();
   fs.writeAsStringAsync = jest.fn();
   fs.deleteAsync = jest.fn();
+  store = create_store();
 });
 
 afterEach(() => {

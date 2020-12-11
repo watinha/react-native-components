@@ -47,6 +47,7 @@ export const take_picture = (photo, date) => {
       `${fs.documentDirectory}/pictures.json`,
       JSON.stringify(new_state));
     dispatch(photo_slice.actions.load(new_state));
+    return new_state.pictures[0];
   };
 };
 export const delete_picture = (item) => {

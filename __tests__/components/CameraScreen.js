@@ -4,8 +4,7 @@ import { Text } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import fs from 'expo-file-system';
 
-import store from '../../store';
-
+import create_store from '../../store';
 import CameraScreen, { CONSTANTS } from '../../components/CameraScreen';
 
 jest.useFakeTimers();
@@ -16,7 +15,8 @@ jest.mock('expo-file-system');
 
 let CameraMock = null,
     date_mock = null,
-    rendered_test = null;
+    rendered_test = null,
+    store;
 
 beforeEach(() => {
   CameraMock = {
@@ -24,15 +24,19 @@ beforeEach(() => {
     takePictureAsync: jest.fn()
   };
   date_mock = { getTime: () => 321 };
-  fs.readAsStringAsync.mockImplementation(() => { throw {}; });
+  fs.readAsStringAsync.mockImplementation(() => { throw { id: 'no'}; });
   fs.writeAsStringAsync.mockReturnValue('');
   fs.moveAsync.mockReturnValue('');
+  store = create_store();
 });
 
 afterEach(() => {
   fs.moveAsync.mockClear();
   fs.readAsStringAsync.mockClear();
   fs.writeAsStringAsync.mockClear();
+  rendered_test.unmount();
+  rendered_test = null;
+  store = null;
 });
 
 it('should ask for permissions before rendering', async () => {
@@ -48,6 +52,10 @@ it('should ask for permissions before rendering', async () => {
     el.props.testID === CONSTANTS.CAMERA_ELEMENT);
   expect(CameraMock.requestPermissionsAsync.mock.calls.length).toBe(1);
   expect(camera_element).not.toBeUndefined();
+
+  preview = rendered_test.root.findAll((el) =>
+    el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
+  expect(preview.length).toBe(0);
 });
 
 it('should not render camera if permissions are not granted', async () => {
@@ -169,4 +177,101 @@ it('should capture picture when pressed a second time', async () => {
     }));
   expect(fs.readAsStringAsync).toBeCalledWith(
     `${fs.documentDirectory}/pictures.json`);
+});
+
+it('should show preview element after press', async () => {
+  let date_mock = { getTime: () => 888 },
+      button = null,
+      camera_element = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}></CameraScreen>
+      </Provider>));
+
+  button = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 755,
+    'width': 255,
+    'uri': 'file:///var/another/file'
+  });
+
+  await act(async () =>
+    button.props.onPress());
+
+  preview = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
+  expect(preview.props.source.uri).toBe(`${fs.documentDirectory}/888.png`);
+});
+
+it('should show preview of another element after press', async () => {
+  let date_mock = { getTime: () => 123 },
+      button = null,
+      camera_element = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}></CameraScreen>
+      </Provider>));
+
+  button = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 755,
+    'width': 255,
+    'uri': 'file:///same/file'
+  });
+
+  await act(async () =>
+    button.props.onPress());
+
+  preview = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
+  expect(preview.props.source.uri).toBe(`${fs.documentDirectory}/123.png`);
+});
+
+it('should remove preview element after some time', async () => {
+  let date_mock = { getTime: () => 777 },
+      button = null,
+      camera_element = null;
+  CameraMock.requestPermissionsAsync.mockResolvedValue({status: true});
+
+  await act(async () =>
+    rendered_test = await create(
+      <Provider store={store}>
+        <CameraScreen Camera_mock={CameraMock}
+                      date_mock={date_mock}
+                      duration_parameter={0}></CameraScreen>
+      </Provider>));
+
+  button = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_BUTTON);
+  camera_element = rendered_test.root.find((el) =>
+    el.props.testID === CONSTANTS.CAMERA_ELEMENT);
+  camera_element.instance.takePictureAsync = jest.fn();
+  camera_element.instance.takePictureAsync.mockResolvedValue({
+    'height': 755,
+    'width': 255,
+    'uri': 'file:///another.thing'
+  });
+
+  await act(async () =>
+    await button.props.onPress());
+
+  preview = rendered_test.root.findAll((el) =>
+    el.props.testID === CONSTANTS.PREVIEW_ELEMENT);
+  expect(preview.length).toBe(0);
 });

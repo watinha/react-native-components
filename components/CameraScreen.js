@@ -1,23 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+import { Image, View, Text, TouchableHighlight, StyleSheet }
+  from 'react-native';
 
 import { Camera } from 'expo-camera';
 
-import { load_json, take_picture } from '../reducers/photo';
+import { load_json, take_picture, map_pictures } from '../reducers/photo';
 
 export const CONSTANTS = {
   CAMERA_ELEMENT: 'camera_element',
   CAMERA_BUTTON: 'camera_button',
+  PREVIEW_ELEMENT: 'preview_element',
   NO_CAMERA_ELEMENT: 'no_camera_message'
 };
 
-export default function CameraScreen ({ Camera_mock, date_mock }) {
+export default function CameraScreen (
+    { Camera_mock, date_mock, duration_parameter }) {
   let [permission, setPermission] = useState(false),
+      [preview, setPreview] = useState(false),
+      pictures = useSelector(map_pictures),
       dispatch = useDispatch(),
       camera_api = Camera_mock ? Camera_mock : Camera,
-      camera = null;
+      camera = null,
+      duration = duration_parameter === 0 ? 0 : 200;
 
   useEffect(() => {
     (async () => {
@@ -29,8 +35,13 @@ export default function CameraScreen ({ Camera_mock, date_mock }) {
 
   const __onPress = async () => {
     const date = date_mock ? date_mock : new Date(),
-          photo = await camera.takePictureAsync();
-    dispatch(take_picture(photo, date))
+          photo = await camera.takePictureAsync(),
+          preview = await dispatch(take_picture(photo, date));
+    setPreview(preview);
+    if (duration === 0)
+      setPreview(false)
+    else
+      setTimeout(() => setPreview(false), duration);
   };
 
   if (!permission) {
@@ -51,6 +62,11 @@ export default function CameraScreen ({ Camera_mock, date_mock }) {
                           onPress={__onPress}>
         <Text>Take Picture</Text>
       </TouchableHighlight>
+      {preview && (
+        <Image testID={CONSTANTS.PREVIEW_ELEMENT}
+               style={styles.preview}
+               source={{ uri: preview['uri'] }}></Image>
+      )}
     </View>
   );
 }
@@ -67,5 +83,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 5,
     alignSelf: 'center'
+  },
+  preview: {
+    height: 100,
+    width: 100,
   }
 });

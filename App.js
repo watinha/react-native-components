@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import AnimatedScreen from './components/AnimatedScreen';
 import CameraScreen from './components/CameraScreen';
 import GaleryScreen from './components/GaleryScreen';
-import store from './store';
+import create_store from './store';
 
 export function FirstScreen ({ navigation }) {
   return (
@@ -45,6 +45,8 @@ function TabBarIcons (route, { focused, color, size }) {
       return <Image source={focused_icons[route.name]} />;
   return <Image source={icons[route.name]} />;
 }
+
+const store = create_store();
 
 export default function App() {
   return (
